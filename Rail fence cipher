@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void rail_fence_encrypt(const char *text, char *encrypted, int rails)
+{
+    int len = strlen(text);
+    char **fence = (char **)malloc(rails * sizeof(char *));
+    for (int i = 0; i < rails; i++)
+        fence[i] = (char *)malloc(len * sizeof(char));
+
+    for (int i = 0; i < rails; i++)
+        for (int j = 0; j < len; j++)
+            fence[i][j] = '\n';
+
+    int row = 0, dir = 1;
+    for (int col = 0; col < len; col++)
+    {
+        fence[row][col] = text[col];
+        row += dir;
+        if (row == 0 || row == rails - 1)
+            dir *= -1;
+    }
+
+    int index = 0;
+    for (int i = 0; i < rails; i++)
+        for (int j = 0; j < len; j++)
+            if (fence[i][j] != '\n')
+                encrypted[index++] = fence[i][j];
+    encrypted[index] = '\0';
+
+    for (int i = 0; i < rails; i++)
+        free(fence[i]);
+    free(fence);
+}
+
+void rail_fence_decrypt(const char *cipher, char *decrypted, int rails)
+{
+    int len = strlen(cipher);
+    char **fence = (char **)malloc(rails * sizeof(char *));
+    for (int i = 0; i < rails; i++)
+        fence[i] = (char *)malloc(len * sizeof(char));
+
+    for (int i = 0; i < rails; i++)
+        for (int j = 0; j < len; j++)
+            fence[i][j] = '\n';
+
+    int row = 0, dir = 1;
+    for (int col = 0; col < len; col++)
+    {
+        fence[row][col] = '*';
+        row += dir;
+        if (row == 0 || row == rails - 1)
+            dir *= -1;
+    }
+
+    int index = 0;
+    for (int i = 0; i < rails; i++)
+        for (int j = 0; j < len; j++)
+            if (fence[i][j] == '*' && index < len)
+                fence[i][j] = cipher[index++];
+
+    row = 0;
+    dir = 1;
+    for (int col = 0; col < len; col++)
+    {
+        decrypted[col] = fence[row][col];
+        row += dir;
+        if (row == 0 || row == rails - 1)
+            dir *= -1;
+    }
+    decrypted[len] = '\0';
+
+    for (int i = 0; i < rails; i++)
+        free(fence[i]);
+    free(fence);
+}
+
+int main()
+{
+    char plaintext[] = "this is rail fence technique";
+    char encrypted[100];
+    char decrypted[100];
+    int rails = 3;
+
+    rail_fence_encrypt(plaintext, encrypted, rails);
+    rail_fence_decrypt(encrypted, decrypted, rails);
+
+    printf("Original:  %s\n", plaintext);
+    printf("Encrypted: %s\n", encrypted);
+    printf("Decrypted: %s\n", decrypted);
+
+    return 0;
+}
