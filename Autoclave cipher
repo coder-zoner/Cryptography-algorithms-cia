@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void auto_key_encrypt(const char *plaintext, const char *keyword, char *output) {
+    char key[200];
+    int pt_len = strlen(plaintext);
+    int key_len = strlen(keyword);
+    int key_index = 0;
+
+    strcpy(key, keyword);
+    for (int i = 0, j = key_len; i < pt_len; i++) {
+        if (isalpha(plaintext[i])) {
+            key[j++] = tolower(plaintext[i]);
+        }
+    }
+
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        char c = plaintext[i];
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            int p = tolower(c) - 'a';
+            int k = key[key_index] - 'a';
+            output[i] = ((p + k) % 26) + base;
+            key_index++;
+        } else {
+            output[i] = c;
+        }
+    }
+}
+
+void auto_key_decrypt(const char *ciphertext, const char *keyword, char *output) {
+    char key[200];
+    strcpy(key, keyword);
+    int key_index = 0;
+    int ct_len = strlen(ciphertext);
+
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        char c = ciphertext[i];
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            int c_index = tolower(c) - 'a';
+            int k_index = tolower(key[key_index]) - 'a';
+            int p = (c_index - k_index + 26) % 26;
+            output[i] = p + base;
+            int len = strlen(key);
+            key[len] = tolower(output[i]);
+            key[len + 1] = '\0';
+            key_index++;
+        } else {
+            output[i] = c;
+        }
+    }
+}
+
+int main() {
+    char plaintext[] = "auto key";
+    char keyword[] = "KEY";
+
+    char encrypted[200] = {0};
+    char decrypted[200] = {0};
+
+    auto_key_encrypt(plaintext, keyword, encrypted);
+    auto_key_decrypt(encrypted, keyword, decrypted);
+
+    printf("Original :  %s\n", plaintext);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
