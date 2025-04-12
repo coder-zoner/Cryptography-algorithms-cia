@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Gronsfeld Encryption Function
+void gronsfeld_encrypt(const char *text, const char *key, char *result) {
+    int key_len = strlen(key);
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        char ch = text[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            int shift = key[i % key_len] - '0';  // Convert char to int
+            char encrypted = ((ch - base + shift) % 26) + base;
+            result[i] = encrypted;
+        } else {
+            result[i] = ch;
+        }
+    }
+
+    result[strlen(text)] = '\0';
+}
+
+// Gronsfeld Decryption Function
+void gronsfeld_decrypt(const char *cipher, const char *key, char *result) {
+    int key_len = strlen(key);
+
+    for (int i = 0; cipher[i] != '\0'; i++) {
+        char ch = cipher[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            int shift = key[i % key_len] - '0';
+            char decrypted = ((ch - base - shift + 26) % 26) + base;
+            result[i] = decrypted;
+        } else {
+            result[i] = ch;
+        }
+    }
+
+    result[strlen(cipher)] = '\0';
+}
+
+int main() {
+    char text[] = "Gronsfeld Cipher";
+    char key[] = "31415";
+    char encrypted[100] = {0};
+    char decrypted[100] = {0};
+
+    gronsfeld_encrypt(text, key, encrypted);
+    gronsfeld_decrypt(encrypted, key, decrypted);
+
+    printf("Original:   %s\n", text);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
