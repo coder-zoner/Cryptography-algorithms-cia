@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Beaufort Cipher Encryption/Decryption function
+void beaufort_cipher(const char *text, const char *key, char *output) {
+    int key_len = strlen(key);
+    int key_index = 0;
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        char c = text[i];
+
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            int t_index = tolower(c) - 'a';  // Text character index
+            int k_index = tolower(key[key_index % key_len]) - 'a';  // Key character index
+            int cipher_index = (k_index - t_index + 26) % 26;  // Beaufort Cipher formula
+            output[i] = cipher_index + base;  // Apply cipher and store result
+            key_index++;
+        } else {
+            output[i] = c;  // Non-alphabetical characters are not altered
+        }
+    }
+}
+
+int main() {
+    char text[] = "Beaufort Cipher";  // Input text
+    char key[] = "KEY";  // Encryption key
+
+    char encrypted[100] = {0};  // To store encrypted text
+    char decrypted[100] = {0};  // To store decrypted text
+
+    beaufort_cipher(text, key, encrypted);  // Encrypt the text
+    beaufort_cipher(encrypted, key, decrypted);  // Decrypt the encrypted text
+
+    printf("Original:  %s\n", text);
+    printf("Encrypted: %s\n", encrypted);
+    printf("Decrypted: %s\n", decrypted);
+
+    return 0;
+}
