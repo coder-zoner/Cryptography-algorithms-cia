@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+void route_encrypt(char *plaintext, char *ciphertext, int rows, int cols)
+{
+    int len = strlen(plaintext);
+    int index = 0;
+    char grid[10][10];
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            if (index < len)
+            {
+                grid[i][j] = plaintext[index++];
+            }
+            else
+            {
+                grid[i][j] = 'X';
+            }
+        }
+    }
+
+    index = 0;
+    for (int i = 0; i < cols; i++)
+    {
+        for (int j = 0; j < rows; j++)
+        {
+            ciphertext[index++] = grid[j][i];
+        }
+    }
+    ciphertext[index] = '\0';
+}
+
+void route_decrypt(char *ciphertext, char *plaintext, int rows, int cols)
+{
+    int len = strlen(ciphertext);
+    int index = 0;
+    char grid[10][10];
+
+    for (int i = 0; i < cols; i++)
+    {
+        for (int j = 0; j < rows; j++)
+        {
+            if (index < len)
+            {
+                grid[j][i] = ciphertext[index++];
+            }
+            else
+            {
+                grid[j][i] = 'X';
+            }
+        }
+    }
+
+    index = 0;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            plaintext[index++] = grid[i][j];
+        }
+    }
+    plaintext[index] = '\0';
+}
+
+int main()
+{
+    char plaintext[] = "this is Route Cipher";
+    int rows = 4;
+    int cols = 5;
+    char encrypted[100], decrypted[100];
+
+    route_encrypt(plaintext, encrypted, rows, cols);
+    route_decrypt(encrypted, decrypted, rows, cols);
+
+    printf("Original:   %s\n", plaintext);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
