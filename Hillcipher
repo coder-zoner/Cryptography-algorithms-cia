@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int mod_inverse(int a, int m) {
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1)
+            return x;
+    }
+    return -1;
+}
+
+void get_inverse_matrix(int key[2][2], int inv_key[2][2]) {
+    int det = (key[0][0] * key[1][1] - key[0][1] * key[1][0]) % 26;
+    if (det < 0) det += 26;
+    int det_inv = mod_inverse(det, 26);
+
+    if (det_inv == -1) {
+        printf("Key matrix not invertible under mod 26.\n");
+        exit(1);
+    }
+
+    inv_key[0][0] = ( key[1][1] * det_inv) % 26;
+    inv_key[0][1] = (-key[0][1] * det_inv) % 26;
+    inv_key[1][0] = (-key[1][0] * det_inv) % 26;
+    inv_key[1][1] = ( key[0][0] * det_inv) % 26;
+
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            if (inv_key[i][j] < 0)
+                inv_key[i][j] += 26;
+}
+
+void hill_encrypt(char *plaintext, char *ciphertext, int key[2][2]) {
+    int len = strlen(plaintext);
+    if (len % 2 != 0) {
+        plaintext[len++] = 'x';
+        plaintext[len] = '\0';
+    }
+
+    for (int i = 0; i < len; i += 2) {
+        int a = plaintext[i] - 'a';
+        int b = plaintext[i+1] - 'a';
+
+        ciphertext[i]   = ((key[0][0] * a + key[0][1] * b) % 26) + 'a';
+        ciphertext[i+1] = ((key[1][0] * a + key[1][1] * b) % 26) + 'a';
+    }
+    ciphertext[len] = '\0';
+}
+
+void hill_decrypt(char *ciphertext, char *plaintext, int key[2][2]) {
+    int inv_key[2][2];
+    get_inverse_matrix(key, inv_key);
+
+    int len = strlen(ciphertext);
+    for (int i = 0; i < len; i += 2) {
+        int a = ciphertext[i] - 'a';
+        int b = ciphertext[i+1] - 'a';
+
+        plaintext[i]   = ((inv_key[0][0] * a + inv_key[0][1] * b) % 26) + 'a';
+        plaintext[i+1] = ((inv_key[1][0] * a + inv_key[1][1] * b) % 26) + 'a';
+    }
+    plaintext[len] = '\0';
+}
+
+int main() {
+    char plaintext[100] = "hillcipher";
+    char ciphertext[100];
+    char decrypted[100];
+
+    int key[2][2] = {
+        {3, 3},
+        {2, 5}
+    };
+
+    hill_encrypt(plaintext, ciphertext, key);
+    hill_decrypt(ciphertext, decrypted, key);
+
+    printf("Original:  %s\n", plaintext);
+    printf("Encrypted: %s\n", ciphertext);
+    printf("Decrypted: %s\n", decrypted);
+
+    return 0;
+}
