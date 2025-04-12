@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void august_cipher(const char *text, char *result, int shift) {
+    for (int i = 0; text[i] != '\0'; i++) {
+        char ch = text[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            result[i] = (char)((ch - base + shift + 26) % 26 + base);
+        } else {
+            result[i] = ch;  // Leave non-alphabet characters unchanged
+        }
+    }
+    result[strlen(text)] = '\0';  // Null-terminate the result
+}
+
+int main() {
+    char plaintext[] = "Hello, World!";
+    char encrypted[100] = {0};
+    char decrypted[100] = {0};
+    int shift = 1; // August cipher
+
+    // Encrypt using August cipher (Caesar with shift 1)
+    august_cipher(plaintext, encrypted, shift);
+
+    // Decrypt using August cipher (apply reverse shift)
+    august_cipher(encrypted, decrypted, -shift);
+
+    printf("Original:   %s\n", plaintext);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
