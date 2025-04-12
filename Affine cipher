@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to compute GCD (used to check coprime)
+int gcd(int a, int b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
+
+// Function to find modular inverse of 'a' under modulo m
+int mod_inverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1)
+            return x;
+    }
+    return -1;  // No modular inverse found
+}
+
+// Affine Cipher Encryption
+void affine_encrypt(const char *text, char *result, int a, int b) {
+    if (gcd(a, 26) != 1) {
+        printf("Error: Key 'a' must be coprime with 26.\n");
+        return;
+    }
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        char ch = text[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            int x = ch - base;
+            int encrypted = (a * x + b) % 26;
+            result[i] = encrypted + base;
+        } else {
+            result[i] = ch;
+        }
+    }
+    result[strlen(text)] = '\0';
+}
+
+// Affine Cipher Decryption
+void affine_decrypt(const char *cipher, char *result, int a, int b) {
+    int a_inv = mod_inverse(a, 26);
+    if (a_inv == -1) {
+        printf("Error: Multiplicative inverse for 'a' doesn't exist under mod 26.\n");
+        return;
+    }
+
+    for (int i = 0; cipher[i] != '\0'; i++) {
+        char ch = cipher[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            int y = ch - base;
+            int decrypted = (a_inv * (y - b + 26)) % 26; // Ensure positive before mod
+            result[i] = decrypted + base;
+        } else {
+            result[i] = ch;
+        }
+    }
+    result[strlen(cipher)] = '\0';
+}
+
+int main() {
+    char text[] = "Affine Cipher";
+    char encrypted[100] = {0};
+    char decrypted[100] = {0};
+    int a = 5;
+    int b = 8;
+
+    affine_encrypt(text, encrypted, a, b);
+    affine_decrypt(encrypted, decrypted, a, b);
+
+    printf("Original:   %s\n", text);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
