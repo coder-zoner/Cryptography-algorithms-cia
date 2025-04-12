@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to encrypt using Vigenère cipher
+void vigenere_encrypt(const char *text, const char *key, char *result) {
+    int key_len = strlen(key);
+    int key_index = 0;
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        char ch = text[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            char key_char = tolower(key[key_index % key_len]);
+            int key_shift = key_char - 'a';
+            char encrypted = ((ch - base + key_shift) % 26) + base;
+            result[i] = encrypted;
+            key_index++;
+        } else {
+            result[i] = ch;
+        }
+    }
+    result[strlen(text)] = '\0';
+}
+
+// Function to decrypt using Vigenère cipher
+void vigenere_decrypt(const char *cipher, const char *key, char *result) {
+    int key_len = strlen(key);
+    int key_index = 0;
+
+    for (int i = 0; cipher[i] != '\0'; i++) {
+        char ch = cipher[i];
+
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            char key_char = tolower(key[key_index % key_len]);
+            int key_shift = key_char - 'a';
+            char decrypted = ((ch - base - key_shift + 26) % 26) + base;
+            result[i] = decrypted;
+            key_index++;
+        } else {
+            result[i] = ch;
+        }
+    }
+    result[strlen(cipher)] = '\0';
+}
+
+int main() {
+    char text[] = "This is vignere cipher";
+    char key[] = "KEY";
+    char encrypted[100] = {0};
+    char decrypted[100] = {0};
+
+    vigenere_encrypt(text, key, encrypted);
+    vigenere_decrypt(encrypted, key, decrypted);
+
+    printf("Original:   %s\n", text);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
