@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void atbash_cipher(const char *text, char *result) {
+    for (int i = 0; text[i] != '\0'; i++) {
+        char ch = text[i];
+
+        if (isalpha(ch)) {
+            if (isupper(ch)) {
+                result[i] = (char)(65 + (25 - (ch - 65)));  // 'A' = 65
+            } else {
+                result[i] = (char)(97 + (25 - (ch - 97)));  // 'a' = 97
+            }
+        } else {
+            result[i] = ch;  // Keep non-alphabetic characters unchanged
+        }
+    }
+    result[strlen(text)] = '\0';  // Null-terminate the result string
+}
+
+int main() {
+    char plaintext[] = "Hello, World!";
+    char encrypted[100] = {0};
+    char decrypted[100] = {0};
+
+    // Encrypt
+    atbash_cipher(plaintext, encrypted);
+
+    // Decrypt (just apply Atbash again)
+    atbash_cipher(encrypted, decrypted);
+
+    printf("Original:   %s\n", plaintext);
+    printf("Encrypted:  %s\n", encrypted);
+    printf("Decrypted:  %s\n", decrypted);
+
+    return 0;
+}
